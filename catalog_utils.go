@@ -419,7 +419,7 @@ func addWipersParams(brand string) []xmlParam {
 	}
 }
 
-func buildOfferModel(inputModel string, avitoModels avitoModelsStruct, regexpTiresModel *regexp.Regexp) string {
+func buildOfferModel(inputModel string, avitoModels AvitoModelsStruct, regexpTiresModel *regexp.Regexp) string {
 
 	if inputModel == "" {
 		return ""

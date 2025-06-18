@@ -183,7 +183,7 @@ func getWordsFrom(text string) []string {
 
 // removeCatTagsHyphen удаляет дефис из значений тегов категории,
 // если кроме них в строке больше нет символов.
-func removeCatTagsHyphen(catTags avitoCategoriesTagsStruct, table string) avitoCategoriesTagsStruct {
+func removeCatTagsHyphen(catTags AvitoCategoriesTagsStruct, table string) AvitoCategoriesTagsStruct {
 
 	if table == "TruckDescrCategories" {
 		if strings.TrimSpace(catTags.TechnicSparePartType) == "-" {
