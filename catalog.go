@@ -63,7 +63,8 @@ type avitoParams struct {
 	FilterOffersPicture int  `json:"filterOffersPicture"` // 0 - не использовать, 1 - Оставлять товары с изображениями, 2 - Оставлять товары без изображений
 }
 
-type avitoModelsStruct struct {
+// AvitoModelsStruct описывает структуру Авито моделей шин.
+type AvitoModelsStruct struct {
 	Response []tireModel `json:"response"`
 }
 
@@ -75,7 +76,8 @@ type tireModel struct {
 	Manual       bool   `json:"manual"`
 }
 
-type avitoCategoriesTagsStruct struct {
+// AvitoCategoriesTagsStruct описывает структуру Авито тегов категорий.
+type AvitoCategoriesTagsStruct struct {
 	Category             string `json:"category"`
 	GoodsType            string `json:"goodsType"`
 	ProductType          string `json:"productType"`
@@ -128,7 +130,7 @@ func (s *offersTaskStock) processXMLStock(inputChan <-chan []position, avito *av
 	var pns map[string]string
 	offers := make(map[string]xmlOfferStock)
 	pfx := "0005"
-	properties, err := parseProperties(avito.PropertiesURL)
+	properties, err := PricegenStorage.ParseProperties(avito.PropertiesURL)
 	if err != nil {
 		s.err = err
 		return
@@ -242,7 +244,7 @@ func (s *offersTask) processXML(posChan <-chan []position, avito *avitoParams, p
 	var (
 		pns           map[string]string
 		propTranslate map[string]string
-		avitoModels   avitoModelsStruct
+		avitoModels   AvitoModelsStruct
 	)
 
 	if avito == nil {
@@ -257,17 +259,17 @@ func (s *offersTask) processXML(posChan <-chan []position, avito *avitoParams, p
 
 	offers := make(map[string]xmlOffer)
 
-	properties, err := parseProperties(avito.PropertiesURL)
+	properties, err := PricegenStorage.ParseProperties(avito.PropertiesURL)
 	if err != nil {
 		s.err = err
 		return
 	}
-	avitoCategoriesTags := getAvitoCategoriesTags()
-	avitoDescrCategoriesTags := getAvitoDescrCategoriesTags()
-	avitoTruckDescrCategoriesTags := getAvitoTruckDescrCategoriesTags()
-	avitoBrandCategoriesTags := getAvitoBrandCategoriesTags()
-	avitoOemSpec := getAvitoSpec("OemSpec", "oem_spec")
-	avitoAtfSpec := getAvitoSpec("ATF", "atf_spec")
+	avitoCategoriesTags := PricegenStorage.GetAvitoCategoriesTags()
+	avitoDescrCategoriesTags := PricegenStorage.GetAvitoDescrCategoriesTags()
+	avitoTruckDescrCategoriesTags := PricegenStorage.GetAvitoTruckDescrCategoriesTags()
+	avitoBrandCategoriesTags := PricegenStorage.GetAvitoBrandCategoriesTags()
+	avitoOemSpec := PricegenStorage.GetAvitoSpec("OemSpec", "oem_spec")
+	avitoAtfSpec := PricegenStorage.GetAvitoSpec("ATF", "atf_spec")
 
 	pfx := "0005"
 
@@ -320,7 +322,7 @@ func (s *offersTask) processXML(posChan <-chan []position, avito *avitoParams, p
 
 			if pos.isTires() {
 				if len(avitoModels.Response) == 0 {
-					avitoModels = getAvitoModels()
+					avitoModels = PricegenStorage.GetAvitoModels()
 				}
 
 				if pos.Condition != 0 {
@@ -1023,7 +1025,7 @@ func addFileNamePostfix(name, pfx string) string {
 	return strings.Join(ss, ".")
 }
 
-func (pos *position) ArticlesIsСargo(brands map[string]avitoCategoriesTagsStruct, priorityDescriptionSource int, posBrand string, descrCategories, avitoCategoriesTags map[string]avitoCategoriesTagsStruct, ggID string) bool {
+func (pos *position) ArticlesIsСargo(brands map[string]AvitoCategoriesTagsStruct, priorityDescriptionSource int, posBrand string, descrCategories, avitoCategoriesTags map[string]AvitoCategoriesTagsStruct, ggID string) bool {
 
 	var (
 		productType        string
@@ -1185,7 +1187,7 @@ func (pos *position) ArticlesIsСargo(brands map[string]avitoCategoriesTagsStruc
 
 	return false
 }
-func (pos *position) buildTagsByBrand(brands map[string]avitoCategoriesTagsStruct, priorityDescriptionSource int, posBrand string) (string, string, string, string) {
+func (pos *position) buildTagsByBrand(brands map[string]AvitoCategoriesTagsStruct, priorityDescriptionSource int, posBrand string) (string, string, string, string) {
 
 	var category, goodsType, productType, sparePartType string
 	for brand, tags := range brands {
@@ -1277,7 +1279,7 @@ func (pos *position) buildTagsByBrand(brands map[string]avitoCategoriesTagsStruc
 
 	return category, goodsType, productType, sparePartType
 }
-func (pos *position) buildTagsByTruckDescription(truckDescrCategories map[string]avitoCategoriesTagsStruct, priorityDescriptionSource int) (string, string) {
+func (pos *position) buildTagsByTruckDescription(truckDescrCategories map[string]AvitoCategoriesTagsStruct, priorityDescriptionSource int) (string, string) {
 
 	var sparePartType, technicSparePartType string
 	for descr, tags := range truckDescrCategories {
@@ -1315,7 +1317,7 @@ func (pos *position) buildTagsByTruckDescription(truckDescrCategories map[string
 	return sparePartType, technicSparePartType
 }
 
-func (pos *position) buildTagsByDescription(avitoCategoriesTags, descrCategories map[string]avitoCategoriesTagsStruct, priorityDescriptionSource int) (string, string, string, string, string, string) {
+func (pos *position) buildTagsByDescription(avitoCategoriesTags, descrCategories map[string]AvitoCategoriesTagsStruct, priorityDescriptionSource int) (string, string, string, string, string, string) {
 
 	var (
 		category, goodsType, productType, sparePartType, sparePartType2, descrGoodsGroup string
